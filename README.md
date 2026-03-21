@@ -1,10 +1,10 @@
- 📊 Telecom Customer Churn Prediction System
+# 📊 Telecom Customer Churn Prediction System
 
 An interactive **Machine Learning web application** built using Streamlit to predict whether a telecom customer will churn or not, along with **AI-based explanations and downloadable results**.
 
+---
 
-
- 🚀 Features
+## 🚀 Features
 
 * 🎯 **Customer Churn Prediction** using trained ML model
 * 🤖 **AI Explanation (Why Churn?)** – Understand key reasons behind prediction
@@ -13,8 +13,9 @@ An interactive **Machine Learning web application** built using Streamlit to pre
 * 📥 **Download Prediction Results** as CSV
 * 🎨 **Modern Dark UI Theme** (Telecom-style dashboard)
 
+---
 
- 🛠️ Technologies Used
+## 🛠️ Technologies Used
 
 * Python
 * Streamlit
@@ -23,8 +24,9 @@ An interactive **Machine Learning web application** built using Streamlit to pre
 * Scikit-learn
 * Joblib
 
+---
 
- 📂 Project Structure
+## 📂 Project Structure
 
 ```
 Telecom-Churn-Prediction/
@@ -34,10 +36,39 @@ Telecom-Churn-Prediction/
 ├── model_columns.pkl
 ├── requirements.txt
 └── README.md
+```
 
+---
 
+## ▶️ How to Run the Project
 
- 📊 Input Features
+### 1️⃣ Clone Repository
+
+```
+git clone https://github.com/rix902/telecom-churn-prediction.git
+```
+
+### 2️⃣ Navigate to Folder
+
+```
+cd telecom-churn-prediction
+```
+
+### 3️⃣ Install Dependencies
+
+```
+pip install -r requirements.txt
+```
+
+### 4️⃣ Run Streamlit App
+
+```
+streamlit run app.py
+```
+
+---
+
+## 📊 Input Features
 
 The model uses the following customer details:
 
@@ -55,18 +86,18 @@ The model uses the following customer details:
 * Customer Value
 * Cluster
 
+---
 
-
- 🎯 Output
+## 🎯 Output
 
 * Prediction: **Churn / Not Churn**
 * Churn Probability Score
 * Risk Level (Low / Medium / High)
 * AI Explanation (Reasons behind churn)
 
+---
 
-
-🤖 AI Explanation
+## 🤖 AI Explanation
 
 The system provides insights such as:
 
@@ -78,13 +109,15 @@ The system provides insights such as:
 
 This helps in **business decision-making and customer retention strategies**.
 
+---
 
-
-📥 Download Feature
+## 📥 Download Feature
 
 Users can download prediction results as a CSV file for further analysis.
 
- 📌 Use Case
+---
+
+## 📌 Use Case
 
 This system can help telecom companies to:
 
@@ -93,16 +126,18 @@ This system can help telecom companies to:
 * Reduce customer loss
 * Enhance customer experience
 
+---
 
- 👨‍💻 Author
+## 👨‍💻 Author
 
-Ravi Prajapati
+**Ravi Prajapati**
 BCA – Machine Learning Project
 
-⭐ Acknowledgement
+---
+
+## ⭐ Acknowledgement
 
 This project demonstrates practical implementation of **Machine Learning + Web Application + Explainable AI**.
 
-
-
+---
 
