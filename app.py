@@ -231,4 +231,4 @@ if submit:
 # Footer
 # -------------------------------
 st.markdown("---")
-st.markdown("🚀 Telecom Churn Prediction | MCA Project")
+st.markdown("🚀 Telecom Churn Prediction | BCA Project create by  RAVI PRAJAPATI")
