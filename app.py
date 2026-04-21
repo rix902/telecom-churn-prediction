@@ -1,4 +1,59 @@
 import streamlit as st
+def set_bg():
+    import streamlit as st
+    st.markdown("""
+    <style>
+    .stApp {
+        background: linear-gradient(rgba(15,32,39,0.85), rgba(44,83,100,0.85)),
+        url("https://images.unsplash.com/photo-1518779578993-ec3579fee39f");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: white;
+    }
+
+    h1, h2, h3 {
+        color: white;
+        text-align: center;
+    }
+
+    label {
+        color: white !important;
+    }
+
+    input, textarea {
+        background-color: white !important;
+        color: black !important;
+        border-radius: 10px;
+    }
+
+    div[data-baseweb="select"] {
+        background-color: white !important;
+        color: black !important;
+    }
+
+    .stButton>button {
+        background: linear-gradient(90deg, #00c6ff, #0072ff);
+        color: white;
+        border-radius: 12px;
+        height: 45px;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    .stDownloadButton>button {
+        background: linear-gradient(90deg, #ff512f, #dd2476);
+        color: white;
+        border-radius: 12px;
+        height: 45px;
+        width: 100%;
+    }
+
+    .css-1d391kg {
+        background-color: rgba(0,0,0,0.4) !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 st.set_page_config(page_title="Login")
 
