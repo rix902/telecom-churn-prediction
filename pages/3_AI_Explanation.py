@@ -1,4 +1,7 @@
 import streamlit as st
+from utils import set_bg
+
+set_bg()
 
 st.title("🤖 AI Explanation")
 
