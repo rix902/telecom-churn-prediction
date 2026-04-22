@@ -1254,6 +1254,10 @@ else:
         show_about()
     else:
         show_dashboard()
+        def show_signup():
+    st.title("Signup")
+
+    name = st.text_input("Name")   # ✔ correct
            name = st.text_input("Name")
 email = st.text_input("Email")
 password = st.text_input("Password")
