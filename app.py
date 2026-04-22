@@ -1,4 +1,3 @@
-# ================== IMPORTS ==================
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -6,18 +5,16 @@ import plotly.graph_objects as go
 import joblib
 import hashlib
 import os
-import time
 
-# ================== CONFIG ==================
+# ================= CONFIG =================
 st.set_page_config(page_title="TelePredict AI", layout="wide")
 
-# ================== FILE PATH ==================
 MODEL_PATH = "churn_model.pkl"
 COLUMNS_PATH = "model_columns.pkl"
 USER_FILE = "users.csv"
 HISTORY_FILE = "history.csv"
 
-# ================== LOAD MODEL ==================
+# ================= LOAD MODEL =================
 @st.cache_resource
 def load_model():
     clf = joblib.load(MODEL_PATH)
@@ -26,11 +23,11 @@ def load_model():
 
 clf, MODEL_COLS = load_model()
 
-# ================== HASH ==================
+# ================= HASH =================
 def hash_pw(p):
     return hashlib.sha256(p.encode()).hexdigest()
 
-# ================== USER SYSTEM ==================
+# ================= USER SYSTEM =================
 def load_users():
     if not os.path.exists(USER_FILE):
         return pd.DataFrame(columns=["email","password","name"])
@@ -53,13 +50,12 @@ def verify(email, password):
         return False
     return user.iloc[0]["password"] == hash_pw(password)
 
-# ================== HISTORY ==================
+# ================= HISTORY =================
 def save_history(email, data, prediction, prob):
     row = data.copy()
     row["email"] = email
     row["prediction"] = prediction
     row["probability"] = prob
-    row["time"] = pd.Timestamp.now()
 
     df = pd.DataFrame([row])
 
@@ -69,24 +65,24 @@ def save_history(email, data, prediction, prob):
 
     df.to_csv(HISTORY_FILE, index=False)
 
-# ================== SESSION ==================
-for k,v in [("logged_in",False),("page","login"),("user_email",""),("user_name","")]:
+# ================= SESSION =================
+for k,v in [("logged_in",False),("page","login"),("user_email","")]:
     if k not in st.session_state:
         st.session_state[k]=v
 
-# ================== UI BG ==================
+# ================= UI STYLE =================
 st.markdown("""
 <style>
 .stApp {
-    background: url("https://images.unsplash.com/photo-1504384308090-c894fdcc538d");
-    background-size: cover;
+    background: linear-gradient(135deg,#020b18,#001f3f);
+    color: white;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ================== LOGIN ==================
+# ================= LOGIN =================
 def show_login():
-    st.title("🔐 Login")
+    st.title("🔐 TelePredict Login")
 
     email = st.text_input("Email")
     pw = st.text_input("Password", type="password")
@@ -95,7 +91,6 @@ def show_login():
         if verify(email,pw):
             st.session_state.logged_in=True
             st.session_state.user_email=email
-            st.session_state.user_name=email
             st.session_state.page="dashboard"
             st.rerun()
         else:
@@ -105,15 +100,15 @@ def show_login():
         st.session_state.page="signup"
         st.rerun()
 
-# ================== SIGNUP ==================
+# ================= SIGNUP =================
 def show_signup():
-    st.title("📝 Signup")
+    st.title("📝 Create Account")
 
     name = st.text_input("Name")
     email = st.text_input("Email")
     pw = st.text_input("Password", type="password")
 
-    if st.button("Create Account"):
+    if st.button("Create"):
         if save_user(email,pw,name):
             st.success("Account created")
         else:
@@ -123,22 +118,19 @@ def show_signup():
         st.session_state.page="login"
         st.rerun()
 
-# ================== DASHBOARD ==================
+# ================= DASHBOARD =================
 def show_dashboard():
     st.title("📊 Dashboard")
-    st.write("Welcome", st.session_state.user_email)
+    st.write("Welcome:", st.session_state.user_email)
 
-# ================== PREDICT ==================
+# ================= PREDICT =================
 def show_predict():
-    st.title("🔮 Prediction")
+    st.title("🔮 Churn Predictor")
 
-    age = st.slider("Age",15,80,30)
-    usage = st.slider("Usage",0,1000,200)
+    vals = [0]*len(MODEL_COLS)
+    df = pd.DataFrame([vals], columns=MODEL_COLS)
 
     if st.button("Predict"):
-        dummy = np.zeros(len(MODEL_COLS))
-        df = pd.DataFrame([dummy], columns=MODEL_COLS)
-
         pred = clf.predict(df)[0]
         prob = clf.predict_proba(df)[0][1]
 
@@ -147,12 +139,12 @@ def show_predict():
 
         save_history(st.session_state.user_email, df.iloc[0].to_dict(), pred, prob)
 
-        result_df = pd.DataFrame({"Prediction":[pred],"Prob":[prob]})
-        st.download_button("Download", result_df.to_csv(index=False))
+        st.download_button("Download",
+            pd.DataFrame({"Prediction":[pred],"Prob":[prob]}).to_csv(index=False))
 
-# ================== HISTORY ==================
+# ================= HISTORY =================
 def show_history():
-    st.title("📜 My History")
+    st.title("📜 History")
 
     if not os.path.exists(HISTORY_FILE):
         st.info("No history")
@@ -165,7 +157,7 @@ def show_history():
 
     st.download_button("Download", df.to_csv(index=False))
 
-# ================== BULK ==================
+# ================= BULK =================
 def show_bulk():
     st.title("📂 Bulk Prediction")
 
@@ -181,7 +173,7 @@ def show_bulk():
 
         st.download_button("Download", df.to_csv(index=False))
 
-# ================== SIDEBAR ==================
+# ================= SIDEBAR =================
 def sidebar():
     with st.sidebar:
         st.write("👤", st.session_state.user_email)
@@ -190,11 +182,12 @@ def sidebar():
         if st.button("Predict"): st.session_state.page="predict"
         if st.button("History"): st.session_state.page="history"
         if st.button("Bulk"): st.session_state.page="bulk"
+
         if st.button("Logout"):
             st.session_state.logged_in=False
             st.session_state.page="login"
 
-# ================== ROUTER ==================
+# ================= ROUTER =================
 if not st.session_state.logged_in:
     if st.session_state.page=="signup":
         show_signup()
@@ -205,5 +198,6 @@ else:
     if st.session_state.page=="dashboard": show_dashboard()
     elif st.session_state.page=="predict": show_predict()
     elif st.session_state.page=="history": show_history()
+    elif st.session_state.page=="bulk": show_bulk()n_state.page=="history": show_history()
     elif st.session_state.page=="bulk": show_bulk()== "about":     show_about()
     else:                  show_dashboard()
