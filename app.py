@@ -1254,5 +1254,6 @@ else:
         show_about()
     else:
         show_dashboard()
-            users[username] = password
+           if st.button("Register"):
+    users[username] = password   # ✔ correct indent
             st.success("Account created ✅ Now login")
