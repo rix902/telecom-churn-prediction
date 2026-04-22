@@ -751,6 +751,4 @@ else:
     elif p == "predict":   show_predictor()
     elif p == "analytics": show_analytics()
     elif p == "about":     show_about()
-    else:                  show_dashboard()_state.page=="bulk": show_bulk()n_state.page=="history": show_history()
-    elif st.session_state.page=="bulk": show_bulk()== "about":     show_about()
     else:                  show_dashboard()
