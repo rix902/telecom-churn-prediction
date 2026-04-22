@@ -1236,32 +1236,30 @@ def show_about():
 # ═══════════════════════════════════════════════════════════════════════════════
 # ROUTER
 # ═══════════════════════════════════════════════════════════════════════════════
-if not st.session_state.logged_in:
-    if st.session_state.page == "forgot_password":
-        show_forgot_password()
-    else:
-        show_login()
-else:
-    show_sidebar()
-    page = st.session_state.page
-    if page == "dashboard":
-        show_dashboard()
-    elif page == "predict":
-        show_predictor()
-    elif page == "analytics":
-        show_analytics()
-    elif page == "about":
-        show_about()
-    else:
-        show_dashboard()
-        def show_signup():
+
+def show_signup():
     st.title("Signup")
 
-    name = st.text_input("Name")   # ✔ correct
-           name = st.text_input("Name")
-email = st.text_input("Email")
-password = st.text_input("Password")
+    name = st.text_input("Name")
+    email = st.text_input("Email")
+    password = st.text_input("Password")
 
-if st.button("Register"):   # ✔ same level
-    save_user(email, password, name)
+    if st.button("Register"):
+        save_user(email, password, name)
+        st.success("Account created ✅ Now login")
+
+
+# ✅ router me call kar
+if page == "dashboard":
+    show_dashboard()
+elif page == "predict":
+    show_predictor()
+elif page == "analytics":
+    show_analytics()
+elif page == "about":
+    show_about()
+elif page == "signup":
+    show_signup()
+else:
+    show_dashboard()
             st.success("Account created ✅ Now login")
