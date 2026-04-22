@@ -1,43 +1,56 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.graph_objects as go
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
+import os
 import hashlib
+from sklearn.ensemble import RandomForestClassifier
 
-# ─── CONFIG ─────────────────────────
+# ───────── CONFIG ─────────
 st.set_page_config(page_title="TelePredict AI", layout="wide")
 
-# ─── USER SYSTEM ─────────────────────
-USERS = {
-    "admin@telepredict.ai": {"password": hashlib.sha256("Admin@123".encode()).hexdigest(), "name": "Admin"},
-    "demo@telepredict.ai": {"password": hashlib.sha256("Demo@123".encode()).hexdigest(), "name": "Demo User"},
-}
+USER_FILE = "users.csv"
+PRED_FILE = "predictions.csv"
 
+# ───────── SECURITY ─────────
 def hash_password(pw):
     return hashlib.sha256(pw.encode()).hexdigest()
 
-def verify(email, pw):
-    return email in USERS and USERS[email]["password"] == hash_password(pw)
+# ───────── USER SYSTEM ─────────
+def load_users():
+    if os.path.exists(USER_FILE):
+        return pd.read_csv(USER_FILE)
+    return pd.DataFrame(columns=["email", "password", "name"])
 
 def save_user(email, password, name):
-    USERS[email] = {
-        "password": hash_password(password),
-        "name": name
-    }
+    df = load_users()
+    if email in df["email"].values:
+        return False
 
-# ─── SESSION ─────────────────────────
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "user_email" not in st.session_state:
-    st.session_state.user_email = ""
-if "user_name" not in st.session_state:
-    st.session_state.user_name = ""
-if "page" not in st.session_state:
-    st.session_state.page = "login"
+    new_user = pd.DataFrame([[email, hash_password(password), name]],
+                            columns=["email", "password", "name"])
+    df = pd.concat([df, new_user], ignore_index=True)
+    df.to_csv(USER_FILE, index=False)
+    return True
 
-# ─── MODEL ───────────────────────────
+def verify(email, pw):
+    df = load_users()
+    user = df[df["email"] == email]
+    if not user.empty:
+        return user.iloc[0]["password"] == hash_password(pw)
+    return False
+
+# ───────── PREDICTION SAVE ─────────
+def save_prediction(email, result):
+    if os.path.exists(PRED_FILE):
+        df = pd.read_csv(PRED_FILE)
+    else:
+        df = pd.DataFrame(columns=["email", "result"])
+
+    new_row = pd.DataFrame([[email, result]], columns=df.columns)
+    df = pd.concat([df, new_row], ignore_index=True)
+    df.to_csv(PRED_FILE, index=False)
+
+# ───────── MODEL ─────────
 @st.cache_resource
 def train_model():
     X = np.random.rand(200, 3)
@@ -46,45 +59,52 @@ def train_model():
     model.fit(X, y)
     return model
 
-# ─── LOGIN PAGE ──────────────────────
+# ───────── SESSION ─────────
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "page" not in st.session_state:
+    st.session_state.page = "login"
+
+# ───────── LOGIN ─────────
 def show_login():
-    st.title("📡 TelePredict AI - Login")
+    st.title("🔐 Login")
 
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
 
-    col1, col2 = st.columns(2)
+    if st.button("Login"):
+        if verify(email, password):
+            df = load_users()
+            user = df[df["email"] == email].iloc[0]
 
-    with col1:
-        if st.button("Login"):
-            if verify(email, password):
-                st.session_state.logged_in = True
-                st.session_state.user_email = email
-                st.session_state.user_name = USERS[email]["name"]
-                st.session_state.page = "dashboard"
-                st.rerun()
-            else:
-                st.error("Invalid credentials")
+            st.session_state.logged_in = True
+            st.session_state.user_email = email
+            st.session_state.user_name = user["name"]
+            st.session_state.page = "dashboard"
 
-    with col2:
-        if st.button("Create Account"):
-            st.session_state.page = "signup"
+            st.success("Login successful ✅")
             st.rerun()
+        else:
+            st.error("Invalid credentials")
 
-# ─── SIGNUP PAGE ─────────────────────
+    if st.button("Create Account"):
+        st.session_state.page = "signup"
+        st.rerun()
+
+# ───────── SIGNUP ─────────
 def show_signup():
-    st.title("🆕 Create Account")
+    st.title("🆕 Signup")
 
     name = st.text_input("Name")
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
 
     if st.button("Register"):
-        if email in USERS:
-            st.error("User already exists")
-        elif name and email and password:
-            save_user(email, password, name)
-            st.success("Account created successfully")
+        if name and email and password:
+            if save_user(email, password, name):
+                st.success("Account created! Go to login")
+            else:
+                st.error("User already exists")
         else:
             st.error("Fill all fields")
 
@@ -92,12 +112,12 @@ def show_signup():
         st.session_state.page = "login"
         st.rerun()
 
-# ─── DASHBOARD ───────────────────────
+# ───────── DASHBOARD ─────────
 def show_dashboard():
-    st.title("📊 Dashboard")
-    st.write(f"Welcome {st.session_state.user_name}")
+    st.title(f"📊 Welcome {st.session_state.user_name}")
+    st.write("TelePredict AI Dashboard")
 
-# ─── PREDICTOR ───────────────────────
+# ───────── PREDICTOR ─────────
 def show_predictor():
     st.title("🔮 Churn Predictor")
 
@@ -108,10 +128,28 @@ def show_predictor():
     x3 = st.slider("Feature 3", 0.0, 1.0)
 
     if st.button("Predict"):
-        pred = model.predict([[x1, x2, x3]])
-        st.success(f"Prediction: {pred[0]}")
+        pred = model.predict([[x1, x2, x3]])[0]
 
-# ─── SIDEBAR ─────────────────────────
+        save_prediction(st.session_state.user_email, pred)
+
+        st.success(f"Prediction: {pred}")
+
+# ───────── HISTORY ─────────
+def show_history():
+    st.title("📁 Prediction History")
+
+    if os.path.exists(PRED_FILE):
+        df = pd.read_csv(PRED_FILE)
+        user_df = df[df["email"] == st.session_state.user_email]
+
+        st.dataframe(user_df)
+
+        csv = user_df.to_csv(index=False).encode("utf-8")
+        st.download_button("Download CSV", csv, "history.csv")
+    else:
+        st.info("No data available")
+
+# ───────── SIDEBAR ─────────
 def show_sidebar():
     with st.sidebar:
         st.title("Navigation")
@@ -120,13 +158,15 @@ def show_sidebar():
             st.session_state.page = "dashboard"
         if st.button("Predict"):
             st.session_state.page = "predict"
+        if st.button("History"):
+            st.session_state.page = "history"
 
         if st.button("Logout"):
             st.session_state.logged_in = False
             st.session_state.page = "login"
             st.rerun()
 
-# ─── ROUTER ──────────────────────────
+# ───────── ROUTER ─────────
 if not st.session_state.logged_in:
     if st.session_state.page == "signup":
         show_signup()
@@ -139,7 +179,7 @@ else:
         show_dashboard()
     elif st.session_state.page == "predict":
         show_predictor()
-    else:
-        show_dashboard()
+    elif st.session_state.page == "history":
+        show_history()
     else:
         show_dashboard()
