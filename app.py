@@ -1262,4 +1262,3 @@ elif page == "signup":
     show_signup()
 else:
     show_dashboard()
-            st.success("Account created ✅ Now login")
