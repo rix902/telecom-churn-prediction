@@ -1254,6 +1254,10 @@ else:
         show_about()
     else:
         show_dashboard()
-           if st.button("Register"):
-    users[username] = password   # ✔ correct indent
+           name = st.text_input("Name")
+email = st.text_input("Email")
+password = st.text_input("Password")
+
+if st.button("Register"):   # ✔ same level
+    save_user(email, password, name)
             st.success("Account created ✅ Now login")
