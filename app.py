@@ -231,5 +231,4 @@ if submit:
 # Footer
 # -------------------------------
 st.markdown("---")
-st.markdown("🚀 Telecom Churn Prediction | BCA Project")== "about":     show_about()
-    else:                  show_dashboard()
+st.markdown("🚀 Telecom Churn Prediction | BCA Project")
