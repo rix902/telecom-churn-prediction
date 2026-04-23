@@ -8,6 +8,8 @@ from pptx.enum.chart import XL_CHART_TYPE
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
+import sys
+st.write(sys.executable)
 
 # ── Color palette ──────────────────────────────────────────────────────────
 DEEP_NAVY  = RGBColor(0x0D, 0x1B, 0x2A)
