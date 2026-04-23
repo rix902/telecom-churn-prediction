@@ -891,4 +891,3 @@ else:
     elif pg == "analytics": page_analytics()
     elif pg == "history":   page_history()
     else:                   page_dashboard()
-        page_dashboard()
