@@ -256,11 +256,45 @@ def inject_css():
         font-weight: 600;
     }
 
-    /* ── Next Page Button ────────────── */
-    .next-btn-container {
-        margin-top: 40px;
-        padding-top: 20px;
+    /* ── Navigation Buttons ──────────── */
+    .nav-footer {
+        margin-top: 48px;
+        padding-top: 24px;
         border-top: 1px solid rgba(99,102,241,0.2);
+    }
+    .step-indicator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+    .step-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        background: rgba(99,102,241,0.25);
+        border: 1px solid rgba(99,102,241,0.3);
+        transition: all 0.3s;
+        display: inline-block;
+    }
+    .step-dot.active {
+        background: #6d28d9;
+        border-color: #a5b4fc;
+        box-shadow: 0 0 8px rgba(109,40,217,0.6);
+        width: 28px;
+        border-radius: 5px;
+    }
+    .step-dot.done {
+        background: rgba(99,102,241,0.55);
+        border-color: #818cf8;
+    }
+    .nav-label {
+        text-align: center;
+        font-size: 0.78rem;
+        color: #64748b;
+        margin-bottom: 16px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -279,29 +313,59 @@ PAGE_LABELS = {
     "Profile":        ("👤", "Profile"),
 }
 
-def next_page_button():
-    """Renders a Next Page button at the bottom of any page except the last."""
+def navigation_buttons():
+    """Renders a full prev/next navigation bar with step indicator at the bottom of every page."""
     current = st.session_state.get("current_page", "Home")
     if current not in PAGE_ORDER:
         return
+
     idx = PAGE_ORDER.index(current)
-    if idx >= len(PAGE_ORDER) - 1:
-        return  # Last page — no next button
+    has_prev = idx > 0
+    has_next = idx < len(PAGE_ORDER) - 1
 
-    next_page = PAGE_ORDER[idx + 1]
-    next_icon, next_label = PAGE_LABELS[next_page]
+    prev_page = PAGE_ORDER[idx - 1] if has_prev else None
+    next_page = PAGE_ORDER[idx + 1] if has_next else None
 
-    st.markdown("<div class='next-btn-container'>", unsafe_allow_html=True)
-    col_left, col_mid, col_right = st.columns([2, 2, 2])
-    with col_mid:
-        if st.button(
-            f"Next: {next_icon} {next_label} →",
-            key=f"next_btn_{current}",
-            use_container_width=True,
-        ):
-            st.session_state["current_page"] = next_page
-            st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+    # ── Step dot indicator ──
+    dots_html = '<div class="step-indicator">'
+    for i, page in enumerate(PAGE_ORDER):
+        if i < idx:
+            dots_html += '<span class="step-dot done"></span>'
+        elif i == idx:
+            dots_html += '<span class="step-dot active"></span>'
+        else:
+            dots_html += '<span class="step-dot"></span>'
+    dots_html += '</div>'
+
+    cur_icon, cur_label = PAGE_LABELS[current]
+    label_html = f'<div class="nav-label">Step {idx + 1} of {len(PAGE_ORDER)} — {cur_icon} {cur_label}</div>'
+
+    st.markdown(f'<div class="nav-footer">{dots_html}{label_html}</div>', unsafe_allow_html=True)
+
+    # ── Prev / Next buttons ──
+    col_prev, col_spacer, col_next = st.columns([2, 2, 2])
+
+    with col_prev:
+        if has_prev:
+            prev_icon, prev_label = PAGE_LABELS[prev_page]
+            if st.button(
+                f"← {prev_icon} {prev_label}",
+                key=f"prev_btn_{current}",
+                use_container_width=True,
+            ):
+                st.session_state["current_page"] = prev_page
+                st.rerun()
+
+    with col_next:
+        if has_next:
+            next_icon, next_label = PAGE_LABELS[next_page]
+            if st.button(
+                f"{next_icon} {next_label} →",
+                key=f"next_btn_{current}",
+                use_container_width=True,
+            ):
+                st.session_state["current_page"] = next_page
+                st.rerun()
 
 
 # ─────────────────────────────────────────────
@@ -799,7 +863,7 @@ def page_prediction():
         st.plotly_chart(fig, use_container_width=True)
 
     # ── Next Page Button ──
-    next_page_button()
+    navigation_buttons()
 
 
 def page_ai_explanation():
@@ -918,7 +982,7 @@ def page_ai_explanation():
     st.plotly_chart(fig3, use_container_width=True)
 
     # ── Next Page Button ──
-    next_page_button()
+    navigation_buttons()
 
 
 def page_analytics():
@@ -1020,7 +1084,7 @@ def page_analytics():
     st.plotly_chart(fig5, use_container_width=True)
 
     # ── Next Page Button ──
-    next_page_button()
+    navigation_buttons()
 
 
 def page_download():
@@ -1032,7 +1096,7 @@ def page_download():
 
     if not user_preds:
         st.info("🔍 No predictions yet. Go to the Prediction page to run your first analysis!")
-        next_page_button()
+        navigation_buttons()
         return
 
     df = pd.DataFrame(user_preds)
@@ -1100,7 +1164,7 @@ def page_download():
         st.plotly_chart(fig, use_container_width=True)
 
     # ── Next Page Button ──
-    next_page_button()
+    navigation_buttons()
 
 
 def page_profile():
@@ -1149,7 +1213,8 @@ def page_profile():
         st.session_state.clear()
         st.rerun()
 
-    # Profile is the last page — no next button
+    # ── Navigation Buttons (shows ← Previous since this is the last page) ──
+    navigation_buttons()
 
 
 # ─────────────────────────────────────────────
