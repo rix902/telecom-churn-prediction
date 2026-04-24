@@ -1207,7 +1207,12 @@ def next_page_button():
         col1, col2, col3 = st.columns([3, 1, 3])
 
         with col2:
-            if st.button(f"Next → {next_page}", key=f"next_{current}", use_container_width=True):
+            # ✅ FIX: unique key
+            if st.button(
+                f"Next → {next_page}",
+                key=f"next_{current}_{next_page}",
+                use_container_width=True
+            ):
                 st.session_state["current_page"] = next_page
                 st.rerun()
 
