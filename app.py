@@ -1252,15 +1252,7 @@ def page_login():
                 else:
                     st.error("Invalid username or password.")
 
-            st.markdown("---")
-            st.markdown(
-                "<div style='text-align:center;color:#64748b;font-size:0.8rem'>Demo: user <b>demo</b> / pass <b>demo123</b></div>",
-                unsafe_allow_html=True
-            )
-            # Auto-create demo account
-            users = load_users()
-            if "demo" not in users:
-                register_user("demo", "demo123", "demo@churnguard.ai")
+
 
         with tab_register:
             with st.form("register_form"):
