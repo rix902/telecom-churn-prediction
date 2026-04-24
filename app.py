@@ -255,8 +255,54 @@ def inject_css():
         font-size: 0.78rem;
         font-weight: 600;
     }
+
+    /* ── Next Page Button ────────────── */
+    .next-btn-container {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(99,102,241,0.2);
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# ─────────────────────────────────────────────
+# PAGE ORDER & NEXT BUTTON
+# ─────────────────────────────────────────────
+PAGE_ORDER = ["Home", "Prediction", "AI Explanation", "Analytics", "Download", "Profile"]
+
+PAGE_LABELS = {
+    "Home":           ("🏠", "Home"),
+    "Prediction":     ("📥", "Prediction"),
+    "AI Explanation": ("🧠", "AI Explanation"),
+    "Analytics":      ("📈", "Analytics"),
+    "Download":       ("⬇️", "Download"),
+    "Profile":        ("👤", "Profile"),
+}
+
+def next_page_button():
+    """Renders a Next Page button at the bottom of any page except the last."""
+    current = st.session_state.get("current_page", "Home")
+    if current not in PAGE_ORDER:
+        return
+    idx = PAGE_ORDER.index(current)
+    if idx >= len(PAGE_ORDER) - 1:
+        return  # Last page — no next button
+
+    next_page = PAGE_ORDER[idx + 1]
+    next_icon, next_label = PAGE_LABELS[next_page]
+
+    st.markdown("<div class='next-btn-container'>", unsafe_allow_html=True)
+    col_left, col_mid, col_right = st.columns([2, 2, 2])
+    with col_mid:
+        if st.button(
+            f"Next: {next_icon} {next_label} →",
+            key=f"next_btn_{current}",
+            use_container_width=True,
+        ):
+            st.session_state["current_page"] = next_page
+            st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
+
 
 # ─────────────────────────────────────────────
 # USER STORE (file-based JSON)
@@ -590,6 +636,9 @@ def page_home():
         </div>
         """, unsafe_allow_html=True)
 
+    # ── Next Page Button ──
+    next_page_button()
+
 
 def page_prediction():
     model, col_list = load_model_and_columns()
@@ -747,7 +796,10 @@ def page_prediction():
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             font_color='#e2e8f0', height=280,
         )
-        st.plotly_chart(fig, use_container_width=True)  
+        st.plotly_chart(fig, use_container_width=True)
+
+    # ── Next Page Button ──
+    next_page_button()
 
 
 def page_ai_explanation():
@@ -865,6 +917,9 @@ def page_ai_explanation():
     )
     st.plotly_chart(fig3, use_container_width=True)
 
+    # ── Next Page Button ──
+    next_page_button()
+
 
 def page_analytics():
     st.markdown("## 📈 Analytics Dashboard")
@@ -964,6 +1019,9 @@ def page_analytics():
                        yaxis=dict(gridcolor='rgba(99,102,241,0.1)'))
     st.plotly_chart(fig5, use_container_width=True)
 
+    # ── Next Page Button ──
+    next_page_button()
+
 
 def page_download():
     st.markdown("## ⬇️ Prediction History & Export")
@@ -974,6 +1032,7 @@ def page_download():
 
     if not user_preds:
         st.info("🔍 No predictions yet. Go to the Prediction page to run your first analysis!")
+        next_page_button()
         return
 
     df = pd.DataFrame(user_preds)
@@ -1040,6 +1099,9 @@ def page_download():
                           yaxis=dict(gridcolor='rgba(99,102,241,0.1)'))
         st.plotly_chart(fig, use_container_width=True)
 
+    # ── Next Page Button ──
+    next_page_button()
+
 
 def page_profile():
     user = st.session_state.get("username", "Unknown")
@@ -1086,6 +1148,8 @@ def page_profile():
     if st.button("🚪 Logout", use_container_width=True):
         st.session_state.clear()
         st.rerun()
+
+    # Profile is the last page — no next button
 
 
 # ─────────────────────────────────────────────
@@ -1190,7 +1254,7 @@ def sidebar_nav():
         status = "🟢 Model Loaded" if model else "🟡 Demo Mode"
         st.markdown(f"<div style='color:#64748b;font-size:0.78rem;text-align:center'>{status}</div>",
                     unsafe_allow_html=True)
-       
+
 
 # ─────────────────────────────────────────────
 # MAIN
@@ -1218,4 +1282,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
