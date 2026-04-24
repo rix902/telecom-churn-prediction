@@ -1215,5 +1215,3 @@ def main():
         "Profile":        page_profile,
     }
     dispatch.get(page, page_home)()
-    if __name__ == "__main__":
-    main()
