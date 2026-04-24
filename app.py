@@ -637,7 +637,7 @@ def page_home():
         """, unsafe_allow_html=True)
 
     # ── Next Page Button ──
-    next_page_button()
+    navigation_buttons()
 
 
 def page_prediction():
