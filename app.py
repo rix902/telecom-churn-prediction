@@ -748,6 +748,9 @@ def page_prediction():
             font_color='#e2e8f0', height=280,
         )
         st.plotly_chart(fig, use_container_width=True)
+        def page_home():
+    ...
+    next_page_button()   
 
 
 def page_ai_explanation():
