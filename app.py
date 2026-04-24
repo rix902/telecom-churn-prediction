@@ -1191,31 +1191,7 @@ def sidebar_nav():
         status = "🟢 Model Loaded" if model else "🟡 Demo Mode"
         st.markdown(f"<div style='color:#64748b;font-size:0.78rem;text-align:center'>{status}</div>",
                     unsafe_allow_html=True)
-        # ─────────────────────────────────────────────
-# NEXT PAGE BUTTON
-# ─────────────────────────────────────────────
-PAGE_ORDER = ["Home", "Prediction", "AI Explanation", "Analytics", "Download", "Profile"]
-
-def next_page_button():
-    current = st.session_state.get("current_page", "Home")
-    idx = PAGE_ORDER.index(current) if current in PAGE_ORDER else 0
-
-    if idx < len(PAGE_ORDER) - 1:
-        next_page = PAGE_ORDER[idx + 1]
-
-        st.markdown("---")
-        col1, col2, col3 = st.columns([3, 1, 3])
-
-        with col2:
-            # ✅ FIX: unique key
-            if st.button(
-                f"Next → {next_page}",
-                key=f"next_{current}_{next_page}",
-                use_container_width=True
-            ):
-                st.session_state["current_page"] = next_page
-                st.rerun()
-
+       
 
 # ─────────────────────────────────────────────
 # MAIN
