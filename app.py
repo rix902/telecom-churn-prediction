@@ -589,7 +589,6 @@ def page_home():
             <p>{label}</p>
         </div>
         """, unsafe_allow_html=True)
-        next_page_button()
 
 
 def page_prediction():
