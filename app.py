@@ -747,10 +747,7 @@ def page_prediction():
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
             font_color='#e2e8f0', height=280,
         )
-        st.plotly_chart(fig, use_container_width=True)
-        def page_home():
-    ...
-    next_page_button()   
+        st.plotly_chart(fig, use_container_width=True)  
 
 
 def page_ai_explanation():
